@@ -47,8 +47,16 @@ const buildGalleryNodes = () => {
     return arr;
 }
 
-window.onload = async () => {
+function displayGallery() {
+    galleryElement.innerHTML = '';
+    const galleryNodes = buildGalleryNodes();
+    galleryNodes.forEach(node => galleryElement.appendChild(node));
+    projectsElement.appendChild(galleryElement);
+}
 
+const GET_ALL_CATEGORY_BUTTONS = () => document.querySelectorAll(".categories button");
+
+window.onload = async () => {
     // FETCHES ALL WORKS AND SETS INITIAL SELECTED WORKS TO ALL WORKS
     const works = await getWorks();
     works.forEach(work => ALL_WORKS.add(work))
@@ -61,18 +69,30 @@ window.onload = async () => {
     for (const category of categories) {
         const categoryButton = document.createElement("button");
         categoryButton.innerText = category.name;
+        categoryButton.dataset.categoryId = category.id
+
         categoryButtonsContainer.appendChild(categoryButton);
     }
     const allButton = document.createElement("button");
     allButton.innerText = "Tous";
+    allButton.dataset.categoryId = "0";
     allButton.classList.add("selected-category-button");
     categoryButtonsContainer.prepend(allButton);
     projectsElement.appendChild(categoryButtonsContainer);
 
 
-    // BUILDS AND DISPLAYS GALLERY OF SELECTED WORKS
-    const galleryNodes = buildGalleryNodes();
-    galleryNodes.forEach(node => galleryElement.appendChild(node));
+    // ADDS EVENT HANDLERS TO REPAINT THE GALLERY WITH FILTERED WORKS
+    GET_ALL_CATEGORY_BUTTONS().forEach(button => button.addEventListener("click", () => {
+        GET_ALL_CATEGORY_BUTTONS().forEach(b => b.classList.remove("selected-category-button"));
+        button.classList.add("selected-category-button");
+        const id = parseInt(button.getAttribute("data-category-id"));
 
-    projectsElement.appendChild(galleryElement)
+        if (id == 0) SELECTED_WORKS = ALL_WORKS;
+        else SELECTED_WORKS = new Set([...ALL_WORKS].filter(w => w.category.id == id))
+
+        displayGallery()
+    }))
+
+    // BUILDS AND DISPLAYS GALLERY OF SELECTED WORKS
+    displayGallery()
 }
