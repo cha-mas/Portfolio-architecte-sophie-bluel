@@ -145,6 +145,13 @@ body {
 	margin: auto;
 	font-family: 'Work Sans';
 	font-size: 14px;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+main {
+	flex: 1;
 }
 
 header {
