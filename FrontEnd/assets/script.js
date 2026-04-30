@@ -69,7 +69,11 @@ function addEditButton() {
     heading.style.alignItems = 'center';
     heading.style.gap = '8px';
 
-    heading.appendChild(btn)
+    heading.appendChild(btn);
+
+    initModal(btn);
+
+    return btn;
 }
 
 function createGalleryItem(work) {
