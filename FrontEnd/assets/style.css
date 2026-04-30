@@ -141,13 +141,19 @@ table {
 
 /** end reset css**/
 body {
-	max-width: 1140px;
-	margin: auto;
 	font-family: 'Work Sans';
 	font-size: 14px;
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
+	background-color: #FFFEF8;
+}
+
+.container {
+	max-width: 1440px;
+	margin: 0 auto;
+	width: 100%;
+	flex: 1;
 }
 
 main {
@@ -335,4 +341,15 @@ footer nav ul {
 	display: flex;
 	justify-content: flex-end;
 	margin: 2em
+}
+
+footer {
+	background-color: #ffffff;
+	padding: 16px 128px 16px 0;
+}
+
+.footer-inner {
+	max-width: 1440px;
+	margin: 0 auto;
+	width: 100%;
 }
