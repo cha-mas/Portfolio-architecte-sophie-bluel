@@ -10,13 +10,14 @@ loginForm.addEventListener('submit', async function (event) {
     const password = passwordInput.value;
 
     if (!email || !password) {
+        alert("Identifiants requis");
         return;
     }
 
     try {
         await loginUser(email, password);
-        console.log('Login successful');
+        window.location.replace("./index.html")
     } catch (error) {
-        console.error('Login failed:', error);
+        alert("Mauvais identifiants");
     }
 });
