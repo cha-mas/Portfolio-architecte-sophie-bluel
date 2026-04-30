@@ -25,7 +25,7 @@ async function loginUser(email, password) {
         }
 
         const data = await response.json();
-        
+
         sessionStorage.setItem(TOKEN_KEY, data.token);
         sessionStorage.setItem(USER_ID_KEY, data.userId.toString());
 
@@ -42,6 +42,7 @@ function logoutUser() {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(USER_ID_KEY);
     updateAuthMenu();
+    window.document.location.reload()
 }
 
 function isAuthenticated() {
@@ -72,7 +73,7 @@ function setupAuthMenuListener() {
     const authLink = document.querySelector('nav ul li a[href*="login.html"]');
     if (!authLink) return;
 
-    authLink.addEventListener('click', function(event) {
+    authLink.addEventListener('click', function (event) {
         if (isAuthenticated()) {
             event.preventDefault();
             logoutUser();
@@ -80,7 +81,7 @@ function setupAuthMenuListener() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     updateAuthMenu();
     setupAuthMenuListener();
 });
