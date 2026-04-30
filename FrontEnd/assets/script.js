@@ -13,6 +13,9 @@ const state = {
     currentWorks: []
 };
 
+// Expose state to window for modal.js access
+window.state = state;
+
 // HTML Elements
 const projectsElement = document.querySelector("#portfolio");
 const galleryElement = document.querySelector(".gallery");
@@ -103,6 +106,9 @@ function displayGallery() {
     galleryElement.innerHTML = '';
     galleryElement.appendChild(buildGalleryNodes());
 }
+
+// Expose displayGallery to window for modal.js access
+window.displayGallery = displayGallery;
 
 function createCategoryButton(category) {
     const button = document.createElement("button");

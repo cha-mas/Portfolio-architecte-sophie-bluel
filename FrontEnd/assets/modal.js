@@ -1,4 +1,7 @@
 
+// Import state from script.js via window object
+const getModalState = () => window.state || { allWorks: [], currentWorks: [] };
+
 const modalState = {
     isVisible: false,
     currentScreen: 1
@@ -10,6 +13,7 @@ let modalElement = null;
 let screenContainerElement = null;
 let closeButtonElement = null;
 let backButtonElement = null;
+let galleryContentElement = null;
 
 
 function createBackdrop() {
@@ -54,16 +58,11 @@ function createCloseButton() {
     const button = document.createElement("button");
     button.type = "button";
 
-    button.style.position = "absolute";
-    button.style.top = "20px";
-    button.style.right = "20px";
     button.style.border = "none";
     button.style.background = "transparent";
     button.style.cursor = "pointer";
-    button.style.fontSize = "20px";
     button.style.lineHeight = "1";
     button.style.padding = "4px";
-    button.style.zIndex = "10";
 
     button.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16px" height="16px">
@@ -84,21 +83,16 @@ function createBackButton() {
     const button = document.createElement("button");
     button.type = "button";
 
-    button.style.position = "absolute";
-    button.style.top = "20px";
-    button.style.left = "20px";
     button.style.border = "none";
     button.style.background = "transparent";
     button.style.cursor = "pointer";
-    button.style.fontSize = "20px";
     button.style.lineHeight = "1";
     button.style.padding = "4px";
-    button.style.display = "none";
-    button.style.zIndex = "10";
+    button.style.visibility = "hidden";
 
     button.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="16px" height="16px">
-            <path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16px" height="16px">
+            <path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 282.6 416 282.6c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/>
         </svg>
     `;
 
@@ -114,7 +108,9 @@ function createBackButton() {
 function createModalHeader() {
     const header = document.createElement("div");
 
-    header.style.position = "relative";
+    header.style.display = "flex";
+    header.style.justifyContent = "space-between";
+    header.style.alignItems = "center";
     header.style.padding = "20px";
 
     return header;
@@ -132,6 +128,147 @@ function createScreenContainer() {
 }
 
 
+function createPreviewImage(work) {
+    const container = document.createElement("div");
+    container.style.position = "relative";
+
+    const img = document.createElement("img");
+    img.src = work.imageUrl;
+    img.alt = work.title;
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "4px";
+    img.style.width = "100%";
+    img.style.display = "block";
+
+    container.appendChild(img);
+
+    return container;
+}
+
+function createDeleteButton() {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.style.position = "absolute";
+    button.style.top = "8px";
+    button.style.right = "8px";
+    button.style.border = "none";
+    button.style.background = "#000";
+    button.style.cursor = "pointer";
+    button.style.padding = "4px";
+    button.style.borderRadius = "4px";
+    button.style.display = "flex";
+    button.style.alignItems = "center";
+    button.style.justifyContent = "center";
+
+    button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16px" height="16px">
+            <path fill="#fff" d="M135.2 17.7L128 32H32C14.9 32 0 46.9 0 64s14.9 32 32 32H96v41.4c0 10.1 .6 25.4 2.1 46.6C104.9 243.7 153.2 384 215.2 464c10.5 13.6 31.1 13.6 41.6 0 62-80 110.3-220.3 117.1-300 1.5-21.2 2.1-36.5 2.1-46.6V96h64c17.1 0 32-14.9 32-32s-14.9-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM160 96H128V64h32V96zm96 0H224V64h32V96zM161.1 144H192c8.8 0 16 7.2 16 16V368c0 8.8-7.2 16-16 16H161.1c-8.8 0-16-7.2-16-16V160c0-8.8 7.2-16 16-16zm96 0H288c8.8 0 16 7.2 16 16V368c0 8.8-7.2 16-16 16H257.1c-8.8 0-16-7.2-16-16V160c0-8.8 7.2-16 16-16z"/>
+        </svg>
+    `;
+
+    return button;
+}
+
+function createPreviewItem(work) {
+    const container = createPreviewImage(work);
+    const deleteButton = createDeleteButton();
+
+    deleteButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        handleDeleteWork(work.id, container);
+    });
+
+    container.appendChild(deleteButton);
+
+    return container;
+}
+
+function handleDeleteWork(workId, element) {
+    alert(`Delete work with id: ${workId}`);
+
+    const state = getModalState();
+    const index = state.allWorks.findIndex(work => work.id === workId);
+    if (index !== -1) {
+        state.allWorks.splice(index, 1);
+    }
+
+    // Update currentWorks to reflect the deletion
+    const currentIndex = state.currentWorks.findIndex(work => work.id === workId);
+    if (currentIndex !== -1) {
+        state.currentWorks.splice(currentIndex, 1);
+    }
+
+    rebuildGallery();
+
+    // Rebuild the main gallery on the page
+    if (typeof window.displayGallery === 'function') {
+        window.displayGallery();
+    }
+}
+
+function buildGalleryGrid() {
+    const state = getModalState();
+    const fragment = document.createDocumentFragment();
+
+    state.allWorks.forEach(work => {
+        fragment.appendChild(createPreviewItem(work));
+    });
+
+    return fragment;
+}
+
+function rebuildGallery() {
+    if (!galleryContentElement) return;
+
+    galleryContentElement.innerHTML = '';
+    galleryContentElement.appendChild(buildGalleryGrid());
+}
+
+function createAddPhotoButton() {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Ajouter une photo";
+
+    button.style.display = "block";
+    button.style.margin = "32px auto 0";
+    button.style.padding = "12px 32px";
+    button.style.backgroundColor = "#1a5f52";
+    button.style.color = "#fff";
+    button.style.border = "none";
+    button.style.borderRadius = "30px";
+    button.style.fontSize = "16px";
+    button.style.fontFamily = "Work Sans";
+    button.style.cursor = "pointer";
+    button.style.width = "300px";
+
+    button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        navigateToScreen(2);
+    });
+
+    return button;
+}
+
+function createGallerySeparator() {
+    const separator = document.createElement("hr");
+    separator.style.border = "none";
+    separator.style.borderTop = "1px solid #ccc";
+    separator.style.margin = "32px 0 0";
+    return separator;
+}
+
+function createGalleryContent() {
+    const content = document.createElement("div");
+    content.style.display = "grid";
+    content.style.gridTemplateColumns = "repeat(5, 1fr)";
+    content.style.gap = "8px";
+    content.style.marginTop = "24px";
+
+    galleryContentElement = content;
+
+    return content;
+}
+
 function createGalleryScreen() {
     const screen = document.createElement("div");
 
@@ -140,8 +277,6 @@ function createGalleryScreen() {
     screen.style.boxSizing = "border-box";
     screen.style.padding = "32px";
 
-    // TODO: Add works management
-
     const title = document.createElement("h3");
     title.textContent = "Galerie photo";
     title.style.textAlign = "center";
@@ -149,6 +284,16 @@ function createGalleryScreen() {
     title.style.fontSize = '26px';
 
     screen.appendChild(title);
+
+    const galleryContent = createGalleryContent();
+    galleryContent.appendChild(buildGalleryGrid());
+    screen.appendChild(galleryContent);
+
+    const separator = createGallerySeparator();
+    screen.appendChild(separator);
+
+    const addPhotoButton = createAddPhotoButton();
+    screen.appendChild(addPhotoButton);
 
     return screen;
 }
@@ -183,9 +328,9 @@ function navigateToScreen(screenNumber) {
 
 
     if (screenNumber === 1) {
-        backButtonElement.style.display = "none";
+        backButtonElement.style.visibility = "hidden";
     } else {
-        backButtonElement.style.display = "block";
+        backButtonElement.style.visibility = "visible";
     }
 }
 
@@ -198,6 +343,8 @@ function buildModal() {
     backButtonElement = createBackButton();
 
     const header = createModalHeader();
+    header.appendChild(backButtonElement);
+    header.appendChild(closeButtonElement);
 
     screenContainerElement = createScreenContainer();
 
@@ -207,8 +354,6 @@ function buildModal() {
     screenContainerElement.appendChild(galleryScreen);
     screenContainerElement.appendChild(addWorkScreen);
 
-    modalElement.appendChild(closeButtonElement);
-    modalElement.appendChild(backButtonElement);
     modalElement.appendChild(header);
     modalElement.appendChild(screenContainerElement);
 
