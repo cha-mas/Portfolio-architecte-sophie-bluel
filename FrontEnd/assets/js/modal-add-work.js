@@ -113,7 +113,7 @@ function showImagePreview(imageDataUrl) {
     }
 
     imagePreviewElement.style.backgroundImage = `url(${imageDataUrl})`;
-    
+
     // Hide the file input area elements
     if (fileInputIconElement) fileInputIconElement.style.opacity = '0';
     if (fileInputButtonElement) fileInputButtonElement.style.opacity = '0';
@@ -124,7 +124,7 @@ function clearImagePreview() {
     if (imagePreviewElement) {
         imagePreviewElement.style.backgroundImage = 'none';
     }
-    
+
     // Show the file input area elements
     if (fileInputIconElement) fileInputIconElement.style.opacity = '1';
     if (fileInputButtonElement) fileInputButtonElement.style.opacity = '1';
@@ -261,17 +261,29 @@ function validateForm() {
     }
 }
 
-function handleFormSubmit() {
-    const formData = {
-        image: fileInputElement.files[0],
-        title: titleInputElement.value,
-        categoryId: categorySelectElement.value
-    };
+async function handleFormSubmit() {
+    const imageFile = fileInputElement.files[0];
+    const title = titleInputElement.value;
+    const category = parseInt(categorySelectElement.value, 10);
 
-    console.log('Form submitted:', formData);
+    try {
+        await createWork(imageFile, title, category);
 
-    resetForm();
-    validateForm();
+        const works = await fetchWorks();
+        setWorks(works);
+
+        if (typeof displayGallery === 'function') {
+            displayGallery();
+        }
+        if (typeof rebuildModalGallery === 'function') {
+            rebuildModalGallery();
+        }
+
+        resetForm();
+        validateForm();
+    } catch (error) {
+        console.error('Failed to create work:', error.message);
+    }
 }
 
 function resetForm() {

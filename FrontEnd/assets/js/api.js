@@ -60,3 +60,38 @@ async function deleteWork(workId) {
 
     return true;
 }
+
+async function createWork(imageFile, title, category) {
+    const token = getAuthToken();
+
+    if (!token) {
+        throw new Error('No authentication token found. Please log in first.');
+    }
+
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    formData.append('title', title);
+    formData.append('category', category);
+
+    const response = await fetch(API_ENDPOINTS.WORKS, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: formData
+    });
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            throw new Error('Bad Request. Please check the form data.');
+        }
+        if (response.status === 401) {
+            throw new Error('Unauthorized. Please log in again.');
+        }
+        throw new Error(`Error creating work (${response.status} - ${response.statusText})`);
+    }
+
+    return response.json();
+}
+
+window.createWork = createWork;
