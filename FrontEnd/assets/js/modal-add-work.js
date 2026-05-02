@@ -5,6 +5,9 @@ let titleInputElement = null;
 let categorySelectElement = null;
 let submitButtonElement = null;
 let imagePreviewElement = null;
+let fileInputIconElement = null;
+let fileInputButtonElement = null;
+let fileInputInfoElement = null;
 
 function createFileInput() {
     const container = document.createElement('div');
@@ -14,7 +17,7 @@ function createFileInput() {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.backgroundColor = "#E8F1F6";
-    container.style.padding = "16px"
+    container.style.padding = "24px"
     container.style.alignItems = 'center';
     container.style.justifyContent = 'center';
     container.style.cursor = 'pointer';
@@ -60,6 +63,9 @@ function createFileInput() {
     container.appendChild(info);
 
     fileInputElement = input;
+    fileInputIconElement = icon;
+    fileInputButtonElement = button;
+    fileInputInfoElement = info;
 
     container.addEventListener('click', function () {
         input.click();
@@ -99,19 +105,30 @@ function showImagePreview(imageDataUrl) {
         imagePreviewElement.style.height = '100%';
         imagePreviewElement.style.backgroundSize = 'contain';
         imagePreviewElement.style.backgroundPosition = 'center';
+        imagePreviewElement.style.backgroundRepeat = 'no-repeat';
         imagePreviewElement.style.zIndex = '1';
 
         const container = fileInputElement.parentElement;
-        container.insertBefore(imagePreviewElement, fileInputElement.nextSibling);
+        container.appendChild(imagePreviewElement, fileInputElement.nextSibling);
     }
 
     imagePreviewElement.style.backgroundImage = `url(${imageDataUrl})`;
+    
+    // Hide the file input area elements
+    if (fileInputIconElement) fileInputIconElement.style.opacity = '0';
+    if (fileInputButtonElement) fileInputButtonElement.style.opacity = '0';
+    if (fileInputInfoElement) fileInputInfoElement.style.opacity = '0';
 }
 
 function clearImagePreview() {
     if (imagePreviewElement) {
         imagePreviewElement.style.backgroundImage = 'none';
     }
+    
+    // Show the file input area elements
+    if (fileInputIconElement) fileInputIconElement.style.opacity = '1';
+    if (fileInputButtonElement) fileInputButtonElement.style.opacity = '1';
+    if (fileInputInfoElement) fileInputInfoElement.style.opacity = '1';
 }
 
 function createTitleInput() {
@@ -267,9 +284,7 @@ function resetForm() {
     if (categorySelectElement) {
         categorySelectElement.value = '';
     }
-    if (imagePreviewElement) {
-        imagePreviewElement.style.backgroundImage = 'none';
-    }
+    clearImagePreview();
 }
 
 function createSeparator() {
@@ -286,14 +301,15 @@ function createAddWorkScreen() {
     screen.style.width = '50%';
     screen.style.flexShrink = '0';
     screen.style.boxSizing = 'border-box';
-    screen.style.padding = '0 10%';
+    screen.style.padding = '0 min(64px, 10%) 16px min(64px, 10%)';
+
 
     const title = document.createElement('h3');
     title.textContent = 'Ajout photo';
     title.style.textAlign = 'center';
     title.style.fontFamily = 'Work Sans';
     title.style.fontSize = '26px';
-    title.style.marginBottom = ''
+    title.style.marginBottom = '24px';
 
     const fileInputContainer = createFileInput();
     const titleInputContainer = createTitleInput();
@@ -317,3 +333,5 @@ function createAddWorkScreen() {
 
 
 window.createAddWorkScreen = createAddWorkScreen;
+window.resetForm = resetForm;
+window.clearImagePreview = clearImagePreview;

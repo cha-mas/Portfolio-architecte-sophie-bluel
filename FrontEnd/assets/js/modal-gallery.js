@@ -46,7 +46,7 @@ function createPreviewItem(work) {
     const container = createPreviewImage(work);
     const deleteButton = createDeleteButton();
 
-    deleteButton.addEventListener('click', function(event) {
+    deleteButton.addEventListener('click', function (event) {
         event.stopPropagation();
         handleDeleteWork(work.id, container);
     });
@@ -59,7 +59,7 @@ function handleDeleteWork(workId, element) {
     alert(`Delete work with id: ${workId}`);
     removeWork(workId);
     rebuildModalGallery();
-    
+
     if (typeof window.displayGallery === 'function') {
         window.displayGallery();
     }
@@ -69,7 +69,7 @@ function buildGalleryGrid() {
     const state = getState();
     const fragment = document.createDocumentFragment();
 
-    state.allWorks.forEach(function(work) {
+    state.allWorks.forEach(function (work) {
         fragment.appendChild(createPreviewItem(work));
     });
 
@@ -115,11 +115,12 @@ function createAddPhotoButton() {
     button.style.border = 'none';
     button.style.borderRadius = '30px';
     button.style.fontSize = '16px';
-    button.style.fontFamily = 'Work Sans';
+    button.style.fontFamily = 'Syne';
+    button.style.fontWeight = '700';
     button.style.cursor = 'pointer';
     button.style.width = '300px';
 
-    button.addEventListener('click', function(event) {
+    button.addEventListener('click', function (event) {
         event.stopPropagation();
         window.navigateToScreen(2);
     });
@@ -133,7 +134,8 @@ function createGalleryScreen() {
     screen.style.width = '50%';
     screen.style.flexShrink = '0';
     screen.style.boxSizing = 'border-box';
-    screen.style.padding = '32px';
+    screen.style.padding = '0 min(64px, 10%) 16px min(64px, 10%)';
+
 
     const title = document.createElement('h3');
     title.textContent = 'Galerie photo';

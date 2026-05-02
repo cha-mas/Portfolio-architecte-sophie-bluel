@@ -121,6 +121,10 @@ function navigateToScreen(screenNumber) {
 
     if (screenNumber === 1) {
         backButtonElement.style.visibility = 'hidden';
+        // Reset the form when navigating back to the gallery screen
+        if (typeof resetForm === 'function') {
+            resetForm();
+        }
     } else {
         backButtonElement.style.visibility = 'visible';
     }
@@ -187,6 +191,11 @@ function closeModal() {
     const state = getModalState();
     state.isVisible = false;
     state.currentScreen = 1;
+
+    // Reset the form when the modal closes
+    if (typeof resetForm === 'function') {
+        resetForm();
+    }
 
     document.removeEventListener('keydown', handleEscapeKey);
 }
