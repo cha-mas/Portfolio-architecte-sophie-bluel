@@ -55,13 +55,17 @@ function createPreviewItem(work) {
     return container;
 }
 
-function handleDeleteWork(workId, element) {
-    alert(`Delete work with id: ${workId}`);
-    removeWork(workId);
-    rebuildModalGallery();
+async function handleDeleteWork(workId, element) {
+    try {
+        await deleteWork(workId);
+        removeWork(workId);
+        rebuildModalGallery();
 
-    if (typeof window.displayGallery === 'function') {
-        window.displayGallery();
+        if (typeof window.displayGallery === 'function') {
+            window.displayGallery();
+        }
+    } catch (error) {
+        console.error('Failed to delete work:', error.message);
     }
 }
 

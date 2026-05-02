@@ -35,7 +35,7 @@ function setupAuthMenuListener() {
     const authLink = document.querySelector('nav ul li a[href*="login.html"]');
     if (!authLink) return;
 
-    authLink.addEventListener('click', function(event) {
+    authLink.addEventListener('click', function (event) {
         if (isAuthenticated()) {
             event.preventDefault();
             logoutUser();
@@ -43,7 +43,9 @@ function setupAuthMenuListener() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     updateAuthMenu();
     setupAuthMenuListener();
 });
+
+window.getAuthToken = getAuthToken;

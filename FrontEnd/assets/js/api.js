@@ -33,6 +33,30 @@ async function loginUser(email, password) {
     const data = await response.json();
     sessionStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.token);
     sessionStorage.setItem(STORAGE_KEYS.USER_ID, data.userId.toString());
-    
+
     return data;
+}
+
+async function deleteWork(workId) {
+    const token = getAuthToken()
+
+    if (!token) {
+        throw new Error('No authentication token found. Please log in first.');
+    }
+
+    const response = await fetch(`${API_ENDPOINTS.WORKS}/${workId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error('Unauthorized. Please log in again.');
+        }
+        throw new Error(`Error deleting work (${response.status} - ${response.statusText})`);
+    }
+
+    return true;
 }
