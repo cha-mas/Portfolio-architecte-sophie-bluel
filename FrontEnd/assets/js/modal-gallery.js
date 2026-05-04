@@ -1,18 +1,13 @@
-/* Gallery management screen for the modal: displays works grid with delete functionality */
-
 let galleryContentElement = null;
 
 function createPreviewImage(work) {
     const container = document.createElement('div');
-    container.style.position = 'relative';
+    container.classList.add('js-preview-container');
 
     const img = document.createElement('img');
     img.src = work.imageUrl;
     img.alt = work.title;
-    img.style.objectFit = 'cover';
-    img.style.borderRadius = '4px';
-    img.style.width = '100%';
-    img.style.display = 'block';
+    img.classList.add('js-preview-image');
 
     container.appendChild(img);
     return container;
@@ -21,17 +16,7 @@ function createPreviewImage(work) {
 function createDeleteButton() {
     const button = document.createElement('button');
     button.type = 'button';
-    button.style.position = 'absolute';
-    button.style.top = '8px';
-    button.style.right = '8px';
-    button.style.border = 'none';
-    button.style.background = '#000';
-    button.style.cursor = 'pointer';
-    button.style.padding = '4px';
-    button.style.borderRadius = '4px';
-    button.style.display = 'flex';
-    button.style.alignItems = 'center';
-    button.style.justifyContent = 'center';
+    button.classList.add('js-delete-btn');
 
     button.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16px" height="16px">
@@ -59,21 +44,19 @@ async function handleDeleteWork(workId, element) {
     try {
         await deleteWork(workId);
         removeWork(workId);
-        rebuildModalGallery();
-
-        if (typeof window.displayGallery === 'function') {
-            window.displayGallery();
-        }
     } catch (error) {
-        console.error('Failed to delete work:', error.message);
+        var errorSpan = document.createElement('span');
+        errorSpan.classList.add('js-error-text');
+        errorSpan.textContent = 'Erreur lors de la suppression. Veuillez réessayer.';
+        galleryContentElement.prepend(errorSpan);
+        setTimeout(function () { errorSpan.remove(); }, 3000);
     }
 }
 
 function buildGalleryGrid() {
-    const state = getState();
     const fragment = document.createDocumentFragment();
 
-    state.allWorks.forEach(function (work) {
+    getAllWorks().forEach(function (work) {
         fragment.appendChild(createPreviewItem(work));
     });
 
@@ -89,10 +72,7 @@ function rebuildModalGallery() {
 
 function createGalleryContent() {
     const content = document.createElement('div');
-    content.style.display = 'grid';
-    content.style.gridTemplateColumns = 'repeat(5, 1fr)';
-    content.style.gap = '8px';
-    content.style.marginTop = '24px';
+    content.classList.add('js-gallery-grid');
 
     galleryContentElement = content;
     return content;
@@ -100,9 +80,7 @@ function createGalleryContent() {
 
 function createGallerySeparator() {
     const separator = document.createElement('hr');
-    separator.style.border = 'none';
-    separator.style.borderTop = '1px solid #ccc';
-    separator.style.margin = '32px 0 0';
+    separator.classList.add('js-separator');
     return separator;
 }
 
@@ -110,19 +88,7 @@ function createAddPhotoButton() {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = 'Ajouter une photo';
-
-    button.style.display = 'block';
-    button.style.margin = '32px auto 0';
-    button.style.padding = '12px 32px';
-    button.style.backgroundColor = '#1a5f52';
-    button.style.color = '#fff';
-    button.style.border = 'none';
-    button.style.borderRadius = '30px';
-    button.style.fontSize = '16px';
-    button.style.fontFamily = 'Syne';
-    button.style.fontWeight = '700';
-    button.style.cursor = 'pointer';
-    button.style.width = '300px';
+    button.classList.add('js-add-photo-btn');
 
     button.addEventListener('click', function (event) {
         event.stopPropagation();
@@ -134,18 +100,11 @@ function createAddPhotoButton() {
 
 function createGalleryScreen() {
     const screen = document.createElement('div');
-
-    screen.style.width = '50%';
-    screen.style.flexShrink = '0';
-    screen.style.boxSizing = 'border-box';
-    screen.style.padding = '0 min(64px, 10%) 16px min(64px, 10%)';
-
+    screen.classList.add('js-screen-panel');
 
     const title = document.createElement('h3');
     title.textContent = 'Galerie photo';
-    title.style.textAlign = 'center';
-    title.style.fontFamily = 'Work Sans';
-    title.style.fontSize = '26px';
+    title.classList.add('js-modal-screen-title');
 
     screen.appendChild(title);
 
@@ -161,6 +120,8 @@ function createGalleryScreen() {
 
     return screen;
 }
+
+stateEvents.on('works:changed', rebuildModalGallery);
 
 window.rebuildModalGallery = rebuildModalGallery;
 window.createGalleryScreen = createGalleryScreen;

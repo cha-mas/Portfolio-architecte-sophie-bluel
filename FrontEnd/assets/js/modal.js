@@ -1,5 +1,3 @@
-/* Modal infrastructure: backdrop, container, navigation, and event handling */
-
 let backdropElement = null;
 let modalElement = null;
 let screenContainerElement = null;
@@ -8,17 +6,7 @@ let backButtonElement = null;
 
 function createBackdrop() {
     const backdrop = document.createElement('div');
-
-    backdrop.style.position = 'fixed';
-    backdrop.style.top = '0';
-    backdrop.style.left = '0';
-    backdrop.style.right = '0';
-    backdrop.style.bottom = '0';
-    backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    backdrop.style.display = 'flex';
-    backdrop.style.justifyContent = 'center';
-    backdrop.style.alignItems = 'center';
-    backdrop.style.zIndex = '1000';
+    backdrop.classList.add('js-backdrop');
 
     backdrop.addEventListener('click', closeModal);
 
@@ -27,13 +15,7 @@ function createBackdrop() {
 
 function createModalContainer() {
     const modal = document.createElement('div');
-
-    modal.style.backgroundColor = '#fff';
-    modal.style.borderRadius = '8px';
-    modal.style.width = '630px';
-    modal.style.maxHeight = '90vh';
-    modal.style.position = 'relative';
-    modal.style.overflow = 'hidden';
+    modal.classList.add('js-modal-container');
 
     modal.addEventListener('click', function(event) {
         event.stopPropagation();
@@ -45,12 +27,7 @@ function createModalContainer() {
 function createCloseButton() {
     const button = document.createElement('button');
     button.type = 'button';
-
-    button.style.border = 'none';
-    button.style.background = 'transparent';
-    button.style.cursor = 'pointer';
-    button.style.lineHeight = '1';
-    button.style.padding = '4px';
+    button.classList.add('js-icon-button');
 
     button.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="16px" height="16px">
@@ -69,13 +46,7 @@ function createCloseButton() {
 function createBackButton() {
     const button = document.createElement('button');
     button.type = 'button';
-
-    button.style.border = 'none';
-    button.style.background = 'transparent';
-    button.style.cursor = 'pointer';
-    button.style.lineHeight = '1';
-    button.style.padding = '4px';
-    button.style.visibility = 'hidden';
+    button.classList.add('js-icon-button', 'js-hidden');
 
     button.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16px" height="16px">
@@ -93,35 +64,26 @@ function createBackButton() {
 
 function createModalHeader() {
     const header = document.createElement('div');
-
-    header.style.display = 'flex';
-    header.style.justifyContent = 'space-between';
-    header.style.alignItems = 'center';
-    header.style.padding = '20px';
+    header.classList.add('js-modal-header');
 
     return header;
 }
 
 function createScreenContainer() {
     const container = document.createElement('div');
-
-    container.style.display = 'flex';
-    container.style.transition = 'transform 0.3s ease';
-    container.style.width = '200%';
+    container.classList.add('js-screen-container');
 
     return container;
 }
 
 function navigateToScreen(screenNumber) {
-    const state = getModalState();
-    state.currentScreen = screenNumber;
+    setCurrentScreen(screenNumber);
 
     const translateX = (screenNumber - 1) * -50;
     screenContainerElement.style.transform = `translateX(${translateX}%)`;
 
     if (screenNumber === 1) {
         backButtonElement.style.visibility = 'hidden';
-        // Reset the form when navigating back to the gallery screen
         if (typeof resetForm === 'function') {
             resetForm();
         }
@@ -159,8 +121,7 @@ function buildModal() {
 }
 
 function toggleModal() {
-    const state = getModalState();
-    if (state.isVisible) {
+    if (isModalVisible()) {
         closeModal();
     } else {
         openModal();
@@ -175,9 +136,8 @@ function openModal() {
         backdropElement.style.display = 'flex';
     }
 
-    const state = getModalState();
-    state.isVisible = true;
-    state.currentScreen = 1;
+    setModalVisible(true);
+    setCurrentScreen(1);
     navigateToScreen(1);
 
     document.addEventListener('keydown', handleEscapeKey);
@@ -188,11 +148,9 @@ function closeModal() {
         backdropElement.style.display = 'none';
     }
 
-    const state = getModalState();
-    state.isVisible = false;
-    state.currentScreen = 1;
+    setModalVisible(false);
+    setCurrentScreen(1);
 
-    // Reset the form when the modal closes
     if (typeof resetForm === 'function') {
         resetForm();
     }

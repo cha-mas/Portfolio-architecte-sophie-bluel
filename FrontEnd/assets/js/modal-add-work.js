@@ -1,5 +1,3 @@
-/* Work creation form screen for the modal: handles photo upload and form submission */
-
 let fileInputElement = null;
 let titleInputElement = null;
 let categorySelectElement = null;
@@ -8,26 +6,17 @@ let imagePreviewElement = null;
 let fileInputIconElement = null;
 let fileInputButtonElement = null;
 let fileInputInfoElement = null;
+let formErrorElement = null;
 
 function createFileInput() {
     const container = document.createElement('div');
-    container.style.marginBottom = '24px';
-    container.style.position = 'relative';
-    container.style.borderRadius = '8px';
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.backgroundColor = "#E8F1F6";
-    container.style.padding = "24px"
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.cursor = 'pointer';
-    container.style.overflow = 'hidden';
+    container.classList.add('js-file-input-container');
 
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/jpeg,image/png';
     input.id = 'file-input';
-    input.style.display = 'none';
+    input.classList.add('js-file-input-hidden');
 
     const icon = document.createElement('div');
     icon.innerHTML = `
@@ -35,27 +24,16 @@ function createFileInput() {
             <path d="M59.6207 6.38793C60.7918 6.38793 61.75 7.34612 61.75 8.51724V51.0768L61.0846 50.2118L42.9855 26.7894C42.3866 26.0042 41.4417 25.5517 40.4569 25.5517C39.4721 25.5517 38.5405 26.0042 37.9283 26.7894L26.8825 41.0824L22.8235 35.3998C22.2247 34.5614 21.2665 34.069 20.2284 34.069C19.1904 34.069 18.2322 34.5614 17.6334 35.4131L6.9868 50.3183L6.38793 51.1434V51.1034V8.51724C6.38793 7.34612 7.34612 6.38793 8.51724 6.38793H59.6207ZM8.51724 0C3.81945 0 0 3.81945 0 8.51724V51.1034C0 55.8012 3.81945 59.6207 8.51724 59.6207H59.6207C64.3185 59.6207 68.1379 55.8012 68.1379 51.1034V8.51724C68.1379 3.81945 64.3185 0 59.6207 0H8.51724ZM19.1638 25.5517C20.0027 25.5517 20.8333 25.3865 21.6083 25.0655C22.3834 24.7444 23.0876 24.2739 23.6807 23.6807C24.2739 23.0876 24.7444 22.3834 25.0655 21.6083C25.3865 20.8333 25.5517 20.0027 25.5517 19.1638C25.5517 18.3249 25.3865 17.4943 25.0655 16.7192C24.7444 15.9442 24.2739 15.24 23.6807 14.6468C23.0876 14.0537 22.3834 13.5831 21.6083 13.2621C20.8333 12.9411 20.0027 12.7759 19.1638 12.7759C18.3249 12.7759 17.4943 12.9411 16.7192 13.2621C15.9442 13.5831 15.24 14.0537 14.6468 14.6468C14.0537 15.24 13.5831 15.9442 13.2621 16.7192C12.9411 17.4943 12.7759 18.3249 12.7759 19.1638C12.7759 20.0027 12.9411 20.8333 13.2621 21.6083C13.5831 22.3834 14.0537 23.0876 14.6468 23.6807C15.24 24.2739 15.9442 24.7444 16.7192 25.0655C17.4943 25.3865 18.3249 25.5517 19.1638 25.5517Z" fill="#B9C5CC"/>
         </svg>
     `;
-
-    icon.style.marginBottom = '16px';
+    icon.classList.add('js-file-input-icon');
 
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = '+ Ajouter photo';
-    button.style.padding = '12px 32px';
-    button.style.backgroundColor = '#CBD6DC';
-    button.style.color = '#306685';
-    button.style.border = 'none';
-    button.style.borderRadius = '30px';
-    button.style.fontSize = '16px';
-    button.style.fontWeight = '500';
-    button.style.fontFamily = 'Work Sans';
-    button.style.cursor = 'pointer';
+    button.classList.add('js-file-input-btn');
 
     const info = document.createElement('p');
     info.textContent = 'jpg, png : 4mo max';
-    info.style.fontSize = '12px';
-    info.style.color = '#444444';
-    info.style.marginTop = '8px';
+    info.classList.add('js-file-input-info');
 
     container.appendChild(input);
     container.appendChild(icon);
@@ -80,9 +58,14 @@ function createFileInput() {
 
 function handleFileSelect(files) {
     if (files && files.length > 0) {
+        var fileContainer = fileInputElement.parentElement;
+        var existing = fileContainer.parentNode.querySelectorAll(':scope > .js-error-text');
+        existing.forEach(function (el) { el.remove(); });
+        fileContainer.classList.remove('js-field-error');
+
         const file = files[0];
         if (file.size > 4 * 1024 * 1024) {
-            alert('Le fichier est trop volumineux. Maximum 4 Mo.');
+            showFieldError(fileContainer, 'Le fichier est trop volumineux. Maximum 4 Mo.');
             return;
         }
 
@@ -98,15 +81,7 @@ function handleFileSelect(files) {
 function showImagePreview(imageDataUrl) {
     if (!imagePreviewElement) {
         imagePreviewElement = document.createElement('div');
-        imagePreviewElement.style.position = 'absolute';
-        imagePreviewElement.style.top = '0';
-        imagePreviewElement.style.left = '0';
-        imagePreviewElement.style.width = '100%';
-        imagePreviewElement.style.height = '100%';
-        imagePreviewElement.style.backgroundSize = 'contain';
-        imagePreviewElement.style.backgroundPosition = 'center';
-        imagePreviewElement.style.backgroundRepeat = 'no-repeat';
-        imagePreviewElement.style.zIndex = '1';
+        imagePreviewElement.classList.add('js-image-preview');
 
         const container = fileInputElement.parentElement;
         container.appendChild(imagePreviewElement, fileInputElement.nextSibling);
@@ -114,7 +89,6 @@ function showImagePreview(imageDataUrl) {
 
     imagePreviewElement.style.backgroundImage = `url(${imageDataUrl})`;
 
-    // Hide the file input area elements
     if (fileInputIconElement) fileInputIconElement.style.opacity = '0';
     if (fileInputButtonElement) fileInputButtonElement.style.opacity = '0';
     if (fileInputInfoElement) fileInputInfoElement.style.opacity = '0';
@@ -125,7 +99,6 @@ function clearImagePreview() {
         imagePreviewElement.style.backgroundImage = 'none';
     }
 
-    // Show the file input area elements
     if (fileInputIconElement) fileInputIconElement.style.opacity = '1';
     if (fileInputButtonElement) fileInputButtonElement.style.opacity = '1';
     if (fileInputInfoElement) fileInputInfoElement.style.opacity = '1';
@@ -133,26 +106,15 @@ function clearImagePreview() {
 
 function createTitleInput() {
     const container = document.createElement('div');
-    container.style.marginBottom = '24px';
+    container.classList.add('js-input-container');
 
     const label = document.createElement('label');
     label.textContent = 'Titre';
-    label.style.display = 'block';
-    label.style.marginBottom = '8px';
-    label.style.fontSize = '16px';
-    label.style.fontFamily = 'Work Sans';
-    label.style.color = '#000';
+    label.classList.add('js-form-label');
 
     const input = document.createElement('input');
     input.type = 'text';
-    input.style.width = '100%';
-    input.style.padding = '16px';
-    input.style.border = 'none';
-    input.style.fontSize = '16px';
-    input.style.fontFamily = 'Work Sans';
-    input.style.boxSizing = 'border-box';
-    input.style.backgroundColor = '#fff';
-    input.style.boxShadow = '0px 4px 14px 0px #00000017';
+    input.classList.add('js-form-field', 'js-form-field-input');
 
     titleInputElement = input;
 
@@ -168,26 +130,14 @@ function createTitleInput() {
 
 function createCategorySelect() {
     const container = document.createElement('div');
-    container.style.marginBottom = '24px';
+    container.classList.add('js-input-container');
 
     const label = document.createElement('label');
     label.textContent = 'Catégorie';
-    label.style.display = 'block';
-    label.style.marginBottom = '8px';
-    label.style.fontSize = '16px';
-    label.style.fontFamily = 'Work Sans';
-    label.style.color = '#000';
+    label.classList.add('js-form-label');
 
     const select = document.createElement('select');
-    select.style.width = '100%';
-    select.style.padding = '16px';
-    select.style.fontSize = '16px';
-    select.style.border = 'none';
-    select.style.fontFamily = 'Work Sans';
-    select.style.boxSizing = 'border-box';
-    select.style.backgroundColor = '#fff';
-    select.style.cursor = 'pointer';
-    select.style.boxShadow = '0px 4px 14px 0px #00000017';
+    select.classList.add('js-form-field', 'js-form-field-select');
 
     categorySelectElement = select;
 
@@ -207,7 +157,7 @@ function populateCategoryOptions() {
 
     select.innerHTML = '';
 
-    getState().categories.forEach(function (category) {
+    getCategories().forEach(function (category) {
         const option = document.createElement('option');
         option.value = category.id;
         option.textContent = category.name;
@@ -220,21 +170,7 @@ function createSubmitButton() {
     button.type = 'button';
     button.textContent = 'Valider';
     button.disabled = true;
-
-    button.style.display = 'block';
-    button.style.padding = '12px 32px';
-    button.style.backgroundColor = '#a7a7a7';
-    button.style.color = '#fff';
-    button.style.border = 'none';
-    button.style.borderRadius = '30px';
-    button.style.fontSize = '16px';
-    button.style.fontFamily = 'Syne';
-    button.style.fontWeight = '700'
-    button.style.cursor = 'pointer';
-    button.style.marginTop = '24px';
-    button.style.marginLeft = 'auto';
-    button.style.marginRight = 'auto';
-    button.style.width = '230px';
+    button.classList.add('js-submit-btn', 'js-submit-btn-invalid');
 
     submitButtonElement = button;
 
@@ -245,18 +181,60 @@ function createSubmitButton() {
     return button;
 }
 
+function clearFormErrors() {
+    titleInputElement.classList.remove('js-field-error');
+    categorySelectElement.classList.remove('js-field-error');
+
+    var fileContainer = fileInputElement.parentElement;
+    var existing = fileContainer.parentNode.querySelectorAll(':scope > .js-error-text');
+    existing.forEach(function (el) { el.remove(); });
+
+    var titleContainer = titleInputElement.parentElement;
+    existing = titleContainer.querySelectorAll('.js-error-text');
+    existing.forEach(function (el) { el.remove(); });
+
+    var categoryContainer = categorySelectElement.parentElement;
+    existing = categoryContainer.querySelectorAll('.js-error-text');
+    existing.forEach(function (el) { el.remove(); });
+
+    if (formErrorElement) formErrorElement.textContent = '';
+}
+
+function showFieldError(field, message) {
+    var container = field.classList ? field : field.parentElement;
+    container.classList.add('js-field-error');
+    var errorSpan = document.createElement('span');
+    errorSpan.classList.add('js-error-text');
+    errorSpan.textContent = message;
+    field.parentElement.insertBefore(errorSpan, field.nextSibling);
+}
+
 function validateForm() {
+    clearFormErrors();
+
     const isFileValid = fileInputElement.files && fileInputElement.files.length > 0;
     const isTitleValid = titleInputElement.value && titleInputElement.value.length >= 3;
     const isCategoryValid = categorySelectElement.value !== '';
 
+    if (!isFileValid) {
+        showFieldError(fileInputElement.parentElement, 'Veuillez sélectionner une image.');
+    }
+    if (!isTitleValid) {
+        showFieldError(titleInputElement, 'Le titre doit contenir au moins 3 caractères.');
+    }
+    if (!isCategoryValid) {
+        showFieldError(categorySelectElement, 'Veuillez sélectionner une catégorie.');
+    }
+
     const isValid = isFileValid && isTitleValid && isCategoryValid;
 
     if (isValid) {
-        submitButtonElement.style.backgroundColor = '#1a5f52';
+        submitButtonElement.classList.remove('js-submit-btn-invalid');
+        submitButtonElement.classList.add('js-submit-btn-valid');
         submitButtonElement.disabled = false;
     } else {
-        submitButtonElement.style.backgroundColor = '#a7a7a7';
+        submitButtonElement.classList.remove('js-submit-btn-valid');
+        submitButtonElement.classList.add('js-submit-btn-invalid');
         submitButtonElement.disabled = true;
     }
 }
@@ -272,17 +250,9 @@ async function handleFormSubmit() {
         const works = await fetchWorks();
         setWorks(works);
 
-        if (typeof displayGallery === 'function') {
-            displayGallery();
-        }
-        if (typeof rebuildModalGallery === 'function') {
-            rebuildModalGallery();
-        }
-
         resetForm();
-        validateForm();
     } catch (error) {
-        console.error('Failed to create work:', error.message);
+        formErrorElement.textContent = 'Erreur lors de l\'ajout de la photo. Veuillez réessayer.';
     }
 }
 
@@ -297,44 +267,39 @@ function resetForm() {
         categorySelectElement.value = '';
     }
     clearImagePreview();
+    clearFormErrors();
 }
 
 function createSeparator() {
     const separator = document.createElement('hr');
-    separator.style.border = 'none';
-    separator.style.borderTop = '1px solid #ccc';
-    separator.style.margin = '32px 0 0';
+    separator.classList.add('js-separator');
     return separator;
 }
 
 function createAddWorkScreen() {
     const screen = document.createElement('div');
-
-    screen.style.width = '50%';
-    screen.style.flexShrink = '0';
-    screen.style.boxSizing = 'border-box';
-    screen.style.padding = '0 min(64px, 10%) 16px min(64px, 10%)';
-
+    screen.classList.add('js-screen-panel');
 
     const title = document.createElement('h3');
     title.textContent = 'Ajout photo';
-    title.style.textAlign = 'center';
-    title.style.fontFamily = 'Work Sans';
-    title.style.fontSize = '26px';
-    title.style.marginBottom = '24px';
+    title.classList.add('js-add-work-title');
 
     const fileInputContainer = createFileInput();
     const titleInputContainer = createTitleInput();
     const categorySelectContainer = createCategorySelect();
     const separator = createSeparator();
-    const submitButton = createSubmitButton();
 
+    formErrorElement = document.createElement('span');
+    formErrorElement.classList.add('js-error-text');
+
+    const submitButton = createSubmitButton();
 
     screen.appendChild(title);
     screen.appendChild(fileInputContainer);
     screen.appendChild(titleInputContainer);
     screen.appendChild(categorySelectContainer);
     screen.appendChild(separator);
+    screen.appendChild(formErrorElement);
     screen.appendChild(submitButton);
 
     populateCategoryOptions()

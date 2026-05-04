@@ -1,5 +1,3 @@
-/* Main projects page: gallery display, category filters, and edit mode UI */
-
 function createGalleryItem(work) {
     const figure = document.createElement('figure');
     const img = document.createElement('img');
@@ -16,20 +14,19 @@ function createGalleryItem(work) {
 }
 
 function buildGalleryNodes() {
-    const state = getState();
     const fragment = document.createDocumentFragment();
-    
-    state.currentWorks.forEach(function(work) {
+
+    getCurrentWorks().forEach(function(work) {
         fragment.appendChild(createGalleryItem(work));
     });
-    
+
     return fragment;
 }
 
 function displayGallery() {
     const galleryElement = document.querySelector('.gallery');
     if (!galleryElement) return;
-    
+
     galleryElement.innerHTML = '';
     galleryElement.appendChild(buildGalleryNodes());
 }
@@ -65,7 +62,7 @@ function createCategoryButtonsContainer(categories) {
 
     const heading = projectsElement.querySelector('h2');
     heading.insertAdjacentElement('afterend', container);
-    
+
     return container.querySelectorAll('button');
 }
 
@@ -78,21 +75,13 @@ function setupCategoryButtons(buttons) {
             button.classList.add(CSS_CLASSES.SELECTED_CATEGORY);
 
             filterWorksByCategory(button.dataset.categoryId);
-            displayGallery();
         });
     });
 }
 
 function createEditButton() {
     const btn = document.createElement('button');
-
-    btn.style.display = 'flex';
-    btn.style.gap = '8px';
-    btn.style.alignItems = 'center';
-    btn.style.justifyContent = 'center';
-    btn.style.border = 'none';
-    btn.style.background = 'transparent';
-    btn.style.cursor = 'pointer';
+    btn.classList.add('js-edit-btn');
 
     btn.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="16px" height="16px">
@@ -102,10 +91,7 @@ function createEditButton() {
     `;
 
     const heading = document.querySelector('#portfolio h2');
-    heading.style.display = 'flex';
-    heading.style.justifyContent = 'center';
-    heading.style.alignItems = 'center';
-    heading.style.gap = '8px';
+    heading.classList.add('js-edit-heading');
 
     heading.appendChild(btn);
 
@@ -116,14 +102,7 @@ function createEditButton() {
 
 function displayEditingBanner() {
     const container = document.createElement('div');
-
-    container.style.display = 'flex';
-    container.style.gap = '8px';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.padding = '16px';
-    container.style.background = '#000';
-    container.style.color = '#fff';
+    container.classList.add('js-edit-banner');
 
     container.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="24px" height="24px">
@@ -153,12 +132,18 @@ async function initializeApp() {
             displayEditingBanner();
             createEditButton();
         }
-
-        displayGallery();
     } catch (error) {
-        console.error('Failed to initialize app:', error);
+        var gallery = document.querySelector('.gallery');
+        if (gallery) {
+            var errorMsg = document.createElement('p');
+            errorMsg.classList.add('js-error-text');
+            errorMsg.textContent = 'Erreur de chargement. Veuillez rafraîchir la page.';
+            gallery.appendChild(errorMsg);
+        }
     }
 }
+
+stateEvents.on('works:changed', displayGallery);
 
 window.displayGallery = displayGallery;
 

@@ -31,8 +31,8 @@ async function loginUser(email, password) {
     }
 
     const data = await response.json();
-    sessionStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.token);
-    sessionStorage.setItem(STORAGE_KEYS.USER_ID, data.userId.toString());
+    setAuthToken(data.token);
+    setUserId(data.userId.toString());
 
     return data;
 }
@@ -94,4 +94,8 @@ async function createWork(imageFile, title, category) {
     return response.json();
 }
 
+window.fetchWorks = fetchWorks;
+window.fetchCategories = fetchCategories;
+window.loginUser = loginUser;
+window.deleteWork = deleteWork;
 window.createWork = createWork;

@@ -13,6 +13,14 @@ function getUserId() {
     return sessionStorage.getItem(STORAGE_KEYS.USER_ID);
 }
 
+function setAuthToken(token) {
+    sessionStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+}
+
+function setUserId(id) {
+    sessionStorage.setItem(STORAGE_KEYS.USER_ID, id);
+}
+
 function logoutUser() {
     sessionStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     sessionStorage.removeItem(STORAGE_KEYS.USER_ID);
@@ -48,4 +56,10 @@ document.addEventListener('DOMContentLoaded', function () {
     setupAuthMenuListener();
 });
 
+window.isAuthenticated = isAuthenticated;
 window.getAuthToken = getAuthToken;
+window.getUserId = getUserId;
+window.setAuthToken = setAuthToken;
+window.setUserId = setUserId;
+window.logoutUser = logoutUser;
+window.updateAuthMenu = updateAuthMenu;
